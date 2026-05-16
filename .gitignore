@@ -1,0 +1,10 @@
+# Derleme Klasörleri
+build/
+out/
+bin/
+bin-int/
+
+# Visual Studio ve Cache
+.vs/
+*.user
+CMakeCache.txt
