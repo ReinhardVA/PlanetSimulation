@@ -8,3 +8,8 @@ bin-int/
 .vs/
 *.user
 CMakeCache.txt
+
+# IDE ve Visual Studio Ayarları
+CMakeSettings.json
+CMakePresets.json
+CMakeUserPresets.json
