@@ -1,4 +1,13 @@
 #include "Renderer.h"
+namespace Renderer
+{
+	//void Renderer::Draw(const sf::Drawable& drawable)
+	//{
+	//	auto window = Application::Get().GetWindow()->GetHandle();
+	//	if (window)
+	//		window->draw(drawable);
+	//}
+}
 //void Renderer::Draw(const std::vector<Planet>& planets, const Planet& sun)
 //{
 //	sf::CircleShape sunShape(sun.GetRadius());

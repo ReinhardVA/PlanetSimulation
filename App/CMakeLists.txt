@@ -1,8 +1,13 @@
-# 1. Uygulama dosyamızı oluşturuyoruz (Dosyada SADECE BİR KERE olmalı)
+### APP
+
+# SADECE Source klasörünün içindeki tüm dosyaları otomatik bulur
+file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS "Source/*.cpp" "Source/*.h")
+
+# Uygulamamızı hem dışarıdaki Main.cpp hem de Source klasöründe bulunan dosyalarla (APP_SOURCES) oluşturuyoruz
 add_executable(App 
     Main.cpp
+    ${APP_SOURCES}
 )
-
 # 2. Kendi yazdığımız Core motorunu uygulamaya bağlıyoruz
 target_link_libraries(App PRIVATE Core)
 
