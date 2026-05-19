@@ -1,11 +1,12 @@
 #pragma once
-#include "Renderer/Renderer.h"
 #include "Window.h"
 #include "Layer.h"
+
 namespace Core
 {
 	struct ApplicationSpecification {
 		std::string Name = "Solar System Simulation";
+		WindowSpecification WindowSpec;
 	};
 	class Application
 	{
@@ -28,7 +29,7 @@ namespace Core
 		template<typename TLayer>
 			requires(std::is_base_of_v<Layer, TLayer>)
 		void PushLayer() {
-			m_layerStack.push_back(std::make_unique<Layer>());
+			m_layerStack.push_back(std::make_unique<TLayer>());
 		}
 
 		template<typename TLayer>

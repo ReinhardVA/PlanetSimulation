@@ -1,14 +1,24 @@
 #include "Application.h"
 #include <cassert>
+#include "Renderer/Renderer.h"
+#include <iostream>
 namespace Core
 {
 
 	static Application* s_Application = nullptr;
+	sf::Clock Application::s_timer;
+
 
 	Application::Application(const ApplicationSpecification& specification)
 		: m_specification(specification)
 	{
 		s_Application = this;
+		
+		if (m_specification.WindowSpec.Title.empty())
+			m_specification.WindowSpec.Title = m_specification.Name;
+
+		m_window = std::make_shared<Window>(m_specification.WindowSpec);
+		m_window->Create();
 	}
 
 	Application::~Application()
@@ -39,7 +49,7 @@ namespace Core
 			// C. Render -> clear screen, draw, display
 
 			Renderer::Clear();
-
+			
 			for (const std::unique_ptr<Layer>& layer : m_layerStack) {
 				layer->OnRender();
 			}

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <iostream>
 namespace Core
 {
 	class Layer
@@ -7,7 +8,8 @@ namespace Core
 	public:
 		virtual ~Layer() = default;
 		virtual void OnUpdate(float deltaTime) {}
-		virtual void OnRender() {}
+		virtual void OnRender() {
+		}
 
 		template<std::derived_from<Layer> T, typename... Args>
 		void TransitionTo(Args&&... args) {
