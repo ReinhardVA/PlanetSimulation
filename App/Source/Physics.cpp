@@ -7,8 +7,8 @@ void Physics::CalculateGravitationalForces(std::vector<CelestialBody>& bodies, f
 		body.acceleration = { 0.0f, 0.0f };
 	}
 	
-	for (size_t i = 0; i < bodies.size(); i++) {
-		for (size_t j = 0; j < bodies.size(); j++) {
+	for (size_t i = 0; i < bodies.size(); ++i) {
+		for (size_t j = 0; j < bodies.size(); ++j) {
 			if (i == j) continue;
 
 			sf::Vector2f direction = bodies[j].position - bodies[i].position;
@@ -23,10 +23,12 @@ void Physics::CalculateGravitationalForces(std::vector<CelestialBody>& bodies, f
 
 void Physics::SetCircularOrbit(std::vector<CelestialBody>& bodies, const CelestialBody& centralBody, float G)
 {
-	for (size_t i = 0; i < bodies.size(); i++) {
+	for (size_t i = 0; i < bodies.size(); ++i) {
 		const float dx = centralBody.position.x - bodies[i].position.x;
 		const float dy = centralBody.position.y - bodies[i].position.y;
 		const float r = std::sqrt(dx * dx + dy * dy);
+		if (r < 0.0001f) 
+			continue;
 		const float circularSpeed = std::sqrt(G * centralBody.mass / r);
 		bodies[i].velocity.x = -dy / r * circularSpeed;
 		bodies[i].velocity.y = dx / r * circularSpeed;
@@ -35,7 +37,7 @@ void Physics::SetCircularOrbit(std::vector<CelestialBody>& bodies, const Celesti
 
 void Physics::EulerIntegrate(std::vector<CelestialBody>& bodies, float deltaTime)
 {
-	for (size_t i = 0; i < bodies.size(); i++) {
+	for (size_t i = 0; i < bodies.size(); ++i) {
 		bodies[i].velocity += bodies[i].acceleration * deltaTime;
 		bodies[i].position += bodies[i].velocity * deltaTime;
 	}

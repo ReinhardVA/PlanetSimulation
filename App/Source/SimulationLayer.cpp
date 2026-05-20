@@ -17,11 +17,11 @@ SimulationLayer::SimulationLayer()
 
 	CelestialBody sun = { {centerX, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10000.0f, sf::Color::Yellow };
 	CelestialBody planet1 = { {centerX, centerY - 200.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue };
-	//CelestialBody planet2 = { {centerX + 200.0f, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red };
+	CelestialBody planet2 = { {centerX + 200.0f, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red };
 
+	m_bodies.push_back(sun);
 	m_bodies.push_back(planet1);
-	
-
+	m_bodies.push_back(planet2);
 
 	Physics::SetCircularOrbit(m_bodies, sun, 1000.0f);
 
@@ -34,7 +34,7 @@ SimulationLayer::~SimulationLayer()
 void SimulationLayer::OnUpdate(float deltaTime)
 {
 	// Physics update
-	Physics::CalculateGravitationalForces(m_bodies, 1.0f);
+	Physics::CalculateGravitationalForces(m_bodies, 1000.0f);
 	Physics::EulerIntegrate(m_bodies, deltaTime);
 }
 
