@@ -2,6 +2,7 @@
 #include <cmath>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <Core\Renderer\Renderer.h>
+#include "Physics.h"
 
 SimulationLayer::SimulationLayer()
 {
@@ -10,9 +11,20 @@ SimulationLayer::SimulationLayer()
 	float centerX = screenSize.x / 2.0f;
 	float centerY = screenSize.y / 2.0f;
 	
-	m_bodies.push_back({ {centerX, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10000.0f, sf::Color::Yellow });
-	m_bodies.push_back({ {centerX, centerY - 200.0f}, {150.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue });
-	m_bodies.push_back({ {centerX + 200.0f, centerY}, {-150.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red });
+	//m_bodies.push_back({ {centerX, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10000.0f, sf::Color::Yellow });
+	//m_bodies.push_back({ {centerX, centerY - 200.0f}, {150.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue });
+	//m_bodies.push_back({ {centerX + 200.0f, centerY}, {-150.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red });
+
+	CelestialBody sun = { {centerX, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10000.0f, sf::Color::Yellow };
+	CelestialBody planet1 = { {centerX, centerY - 200.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue };
+	//CelestialBody planet2 = { {centerX + 200.0f, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red };
+
+	m_bodies.push_back(planet1);
+	
+
+
+	Physics::SetCircularOrbit(m_bodies, sun, 1000.0f);
+
 }
 
 SimulationLayer::~SimulationLayer()
@@ -22,6 +34,8 @@ SimulationLayer::~SimulationLayer()
 void SimulationLayer::OnUpdate(float deltaTime)
 {
 	// Physics update
+	Physics::CalculateGravitationalForces(m_bodies, 1.0f);
+	Physics::EulerIntegrate(m_bodies, deltaTime);
 }
 
 void SimulationLayer::OnRender()

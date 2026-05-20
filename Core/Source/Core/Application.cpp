@@ -1,7 +1,7 @@
 #include "Application.h"
 #include <cassert>
 #include "Renderer/Renderer.h"
-#include <iostream>
+
 namespace Core
 {
 
@@ -61,40 +61,6 @@ namespace Core
 		// Draw
 		// Display
 
-		// Main application loop
-		//while (m_running)
-		//{
-		//	const float deltaTime = std::min(frameClock.restart().asSeconds(), 0.033f);
-			//m_renderer.PollEvents();
-			//m_renderer.Clear();
-			//for (auto& layer : m_layerStack)
-			//{
-			//	layer->OnUpdate(deltaTime);
-			//	layer->OnRender(m_renderer);
-			//}
-			//m_renderer.Display();
-		//}
-		//Planet planet1(10.0f, 20.0f, 100.0f, 100.0f);
-		//Planet sun(1000.0f, 50.0f, 400.0f, 300.0f);
-		//std::vector<Planet> planets = { planet1 };
-		//const float G = 30000;
-		//const float dx = sun.m_x - planet1.m_x;
-		//const float dy = sun.m_y - planet1.m_y;
-		//const float r = sqrt(dx * dx + dy * dy);
-		//const float circularSpeed = sqrt(G * sun.m_mass / r);
-
-		//planets[0].m_velocityX = -dy / r * circularSpeed;
-		//planets[0].m_velocityY = dx / r * circularSpeed;
-		//sf::Clock frameClock;
-		//while (m_renderer.IsOpen())
-		//{
-		//	const float deltaTime = std::min(frameClock.restart().asSeconds(), 0.033f);
-		//	m_renderer.PollEvents();
-		//	m_renderer.Clear();
-		//	EulerIntegrate(deltaTime, planets, sun);
-		//	m_renderer.Draw(planets, sun);
-		//	m_renderer.Display();
-		//}
 	}
 
 	void Application::Stop()
@@ -116,27 +82,5 @@ namespace Core
 	{
 		return s_timer.getElapsedTime().asSeconds();
 	}
-	//void Application::EulerIntegrate(float deltaTime, std::vector<Planet>& planets, Planet& sun)
-	//{
-	//	double G = 30000;
-	//	float dx = sun.m_x - planets[0].m_x;
-	//	float dy = sun.m_y - planets[0].m_y;
-	//	float distancesq = dx * dx + dy * dy + 0.0001f;
-	//	float distance = sqrt(distancesq);
-
-	//	float accelFator = G * sun.m_mass / (distance * distancesq);
-	//	float accelerationX = accelFator * dx;
-	//	float accelerationY = accelFator * dy;
-
-	//	// Update Velocity
-	//	planets[0].m_velocityX += accelerationX * deltaTime;
-	//	planets[0].m_velocityY += accelerationY * deltaTime;
-	//	// Store Previous Position
-	//	planets[0].m_previousX = planets[0].m_x;
-	//	planets[0].m_previousY = planets[0].m_y;
-	//	// Update Position
-	//	planets[0].m_x = planets[0].m_previousX + planets[0].m_velocityX * deltaTime;
-	//	planets[0].m_y = planets[0].m_previousY + planets[0].m_velocityY * deltaTime;
-
-	//}
+	
 }
