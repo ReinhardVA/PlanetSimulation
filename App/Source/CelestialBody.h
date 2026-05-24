@@ -4,6 +4,7 @@
 struct CelestialBody
 {
 	sf::Vector2f position;
+	sf::Vector2f previousPosition; // For Verlet integration
 	sf::Vector2f velocity;
 	sf::Vector2f acceleration;
 	float mass;

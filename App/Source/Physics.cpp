@@ -8,7 +8,7 @@ void Physics::CalculateGravitationalForces(std::vector<CelestialBody>& bodies, f
 	}
 	
 	for (size_t i = 0; i < bodies.size(); ++i) {
-		for (size_t j = 0; j < bodies.size(); ++j) {
+		for (size_t j = 0; j < bodies.size(); j++) {
 			if (i == j) continue;
 
 			sf::Vector2f direction = bodies[j].position - bodies[i].position;
@@ -24,7 +24,7 @@ void Physics::CalculateGravitationalForces(std::vector<CelestialBody>& bodies, f
 void Physics::SetCircularOrbit(std::vector<CelestialBody>& bodies, const CelestialBody& centralBody, float G)
 {
 	for (size_t i = 0; i < bodies.size(); ++i) {
-		const float dx = centralBody.position.x - bodies[i].position.x;
+ 		const float dx = centralBody.position.x - bodies[i].position.x;
 		const float dy = centralBody.position.y - bodies[i].position.y;
 		const float r = std::sqrt(dx * dx + dy * dy);
 		if (r < 0.0001f) 
@@ -42,3 +42,20 @@ void Physics::EulerIntegrate(std::vector<CelestialBody>& bodies, float deltaTime
 		bodies[i].position += bodies[i].velocity * deltaTime;
 	}
 }
+
+void Physics::InitializeVerlet(std::vector<CelestialBody>& bodies, float deltaTime)
+{
+	for (auto& body : bodies) {
+		body.previousPosition = body.position - (body.velocity * deltaTime) + 0.5f * body.acceleration * deltaTime * deltaTime;
+	}
+}
+
+void Physics::VerletIntegrate(std::vector<CelestialBody>& bodies, float deltaTime)
+{
+	for (size_t i = 0; i < bodies.size(); ++i) {
+		sf::Vector2f newPosition = 2.0f * bodies[i].position - bodies[i].previousPosition + bodies[i].acceleration * deltaTime * deltaTime;
+		bodies[i].previousPosition = bodies[i].position;
+		bodies[i].position = newPosition;
+	}
+}
+

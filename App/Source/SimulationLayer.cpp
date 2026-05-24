@@ -4,6 +4,8 @@
 #include <Core\Renderer\Renderer.h>
 #include "Physics.h"
 
+#define GravitationalConstant 1000.0f
+
 SimulationLayer::SimulationLayer()
 {
 	sf::Vector2f screenSize = Core::Application::Get().GetFrameBufferSize();
@@ -15,16 +17,17 @@ SimulationLayer::SimulationLayer()
 	//m_bodies.push_back({ {centerX, centerY - 200.0f}, {150.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue });
 	//m_bodies.push_back({ {centerX + 200.0f, centerY}, {-150.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red });
 
-	CelestialBody sun = { {centerX, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10000.0f, sf::Color::Yellow };
-	CelestialBody planet1 = { {centerX, centerY - 200.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue };
-	CelestialBody planet2 = { {centerX + 200.0f, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red };
+	CelestialBody sun = { {centerX, centerY}, {centerX, centerY},{0.0f, 0.0f}, {0.0f, 0.0f}, 10000.0f, sf::Color::Yellow };
+	CelestialBody planet1 = { {centerX, centerY - 200.0f}, {centerX, centerY - 200.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue };
+	CelestialBody planet2 = { {centerX + 200.0f, centerY}, {centerX + 200.0f, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red };
 
 	m_bodies.push_back(sun);
 	m_bodies.push_back(planet1);
 	m_bodies.push_back(planet2);
 
-	Physics::SetCircularOrbit(m_bodies, sun, 1000.0f);
-
+	Physics::SetCircularOrbit(m_bodies, sun, GravitationalConstant);
+	Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
+	Physics::InitializeVerlet(m_bodies, 0.016f); // Assuming 60 FPS
 }
 
 SimulationLayer::~SimulationLayer()
@@ -34,8 +37,9 @@ SimulationLayer::~SimulationLayer()
 void SimulationLayer::OnUpdate(float deltaTime)
 {
 	// Physics update
-	Physics::CalculateGravitationalForces(m_bodies, 1000.0f);
-	Physics::EulerIntegrate(m_bodies, deltaTime);
+	Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
+	//Physics::EulerIntegrate(m_bodies, deltaTime);
+	Physics::VerletIntegrate(m_bodies, deltaTime);
 }
 
 void SimulationLayer::OnRender()
