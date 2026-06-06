@@ -3,6 +3,7 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <Core\Renderer\Renderer.h>
 #include "Physics.h"
+#include "Barnes-Hut.h"
 
 #define GravitationalConstant 1000.0f
 
@@ -24,10 +25,18 @@ SimulationLayer::SimulationLayer()
 	m_bodies.push_back(sun);
 	m_bodies.push_back(planet1);
 	m_bodies.push_back(planet2);
-
+	
 	Physics::SetCircularOrbit(m_bodies, sun, GravitationalConstant);
 	Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
 	Physics::InitializeVerlet(m_bodies, 0.016f); // Assuming 60 FPS
+	
+	BarnesHut::Quad::CreateFromBounds(m_bodies);
+	BarnesHut::Quadtree quadtree(0.5f, 0.1f);
+
+	for (size_t i = 0; i < m_bodies.size(); ++i) {
+		quadtree.insert(m_bodies[i].position, m_bodies[i].mass);
+	}
+
 }
 
 SimulationLayer::~SimulationLayer()
@@ -37,9 +46,12 @@ SimulationLayer::~SimulationLayer()
 void SimulationLayer::OnUpdate(float deltaTime)
 {
 	// Physics update
-	Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
+	//Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
 	//Physics::EulerIntegrate(m_bodies, deltaTime);
-	Physics::VerletIntegrate(m_bodies, deltaTime);
+	//Physics::VerletIntegrate(m_bodies, deltaTime);
+	sf::Vector2f acceleration = BarnesHut::Quadtree(0.5f, 0.1f).acceleration(m_bodies[1].position);
+
+
 }
 
 void SimulationLayer::OnRender()
