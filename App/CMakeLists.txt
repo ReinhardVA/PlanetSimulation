@@ -7,8 +7,8 @@ file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS "Source/*.cpp" "Source/*.h")
 add_executable(App 
     Main.cpp
     ${APP_SOURCES}
-    "Source/Barnes-Hut.h"
-    "Source/Barnes-Hut.cpp"
+    "Source/BarnesHut.h"
+    "Source/BarnesHut.cpp"
  )
 # 2. Kendi yazdığımız Core motorunu uygulamaya bağlıyoruz
 target_link_libraries(App PRIVATE Core)

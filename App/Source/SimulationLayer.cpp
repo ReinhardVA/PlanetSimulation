@@ -1,41 +1,60 @@
 #include "SimulationLayer.h"
-#include <cmath>
+#include "Physics.h"
+#include "BarnesHut.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <Core\Renderer\Renderer.h>
-#include "Physics.h"
-#include "Barnes-Hut.h"
 
-#define GravitationalConstant 1000.0f
+#include <cmath>
+#include <random>
+#include <numbers>
 
-SimulationLayer::SimulationLayer()
+#define GravitationalConstant 0.06f
+
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<float> massDist(1.0f, 100.0f);
+
+float sunMass = 5000000.0f;
+
+SimulationLayer::SimulationLayer() : m_quadtree(0.5f, 1.0f)
 {
 	sf::Vector2f screenSize = Core::Application::Get().GetFrameBufferSize();
 	
 	float centerX = screenSize.x / 2.0f;
 	float centerY = screenSize.y / 2.0f;
-	
-	//m_bodies.push_back({ {centerX, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10000.0f, sf::Color::Yellow });
-	//m_bodies.push_back({ {centerX, centerY - 200.0f}, {150.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue });
-	//m_bodies.push_back({ {centerX + 200.0f, centerY}, {-150.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red });
 
-	CelestialBody sun = { {centerX, centerY}, {centerX, centerY},{0.0f, 0.0f}, {0.0f, 0.0f}, 10000.0f, sf::Color::Yellow };
-	CelestialBody planet1 = { {centerX, centerY - 200.0f}, {centerX, centerY - 200.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue };
-	CelestialBody planet2 = { {centerX + 200.0f, centerY}, {centerX + 200.0f, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red };
+	CelestialBody sun = { {centerX, centerY}, {centerX, centerY},{0.0f, 0.0f}, {0.0f, 0.0f}, sunMass, sf::Color::Yellow };
+	//CelestialBody planet1 = { {centerX, centerY - 200.0f}, {centerX, centerY - 200.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue };
+	//CelestialBody planet2 = { {centerX + 200.0f, centerY}, {centerX + 200.0f, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red };
 
 	m_bodies.push_back(sun);
-	m_bodies.push_back(planet1);
-	m_bodies.push_back(planet2);
+	//m_bodies.push_back(planet1);
+	//m_bodies.push_back(planet2);
 	
+	for (size_t i = 0; i < 1000; ++i) {
+		float angle = (static_cast<float>(i) / 1000.0f) * 2.0f * std::numbers::pi_v<float>;
+		float radius = 300.0f + static_cast<float>(i) / 1000.0f * 200.0f;
+		
+		float posX = centerX + radius * std::cos(angle);
+		float posY = centerY + radius * std::sin(angle);
+		float orbitalVelocity = std::sqrt(GravitationalConstant * sunMass / radius);
+		float velX = -std::sin(angle) * std::sin(angle);
+		float velY = std::cos(angle) * std::cos(angle);
+		float randomMass = massDist(gen);
+		CelestialBody body = {
+			{posX, posY},
+			{posX, posY},
+			{velX, velY},
+			{0.0f, 0.0f},
+			randomMass,
+			sf::Color::Green
+		};
+		m_bodies.push_back(body);
+	};
 	Physics::SetCircularOrbit(m_bodies, sun, GravitationalConstant);
-	Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
+	//Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
 	Physics::InitializeVerlet(m_bodies, 0.016f); // Assuming 60 FPS
 	
-	BarnesHut::Quad::CreateFromBounds(m_bodies);
-	BarnesHut::Quadtree quadtree(0.5f, 0.1f);
-
-	for (size_t i = 0; i < m_bodies.size(); ++i) {
-		quadtree.insert(m_bodies[i].position, m_bodies[i].mass);
-	}
 
 }
 
@@ -45,13 +64,29 @@ SimulationLayer::~SimulationLayer()
 
 void SimulationLayer::OnUpdate(float deltaTime)
 {
+	BarnesHutImplemantation();
+
 	// Physics update
 	//Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
+	
 	//Physics::EulerIntegrate(m_bodies, deltaTime);
-	//Physics::VerletIntegrate(m_bodies, deltaTime);
-	sf::Vector2f acceleration = BarnesHut::Quadtree(0.5f, 0.1f).acceleration(m_bodies[1].position);
 
+	Physics::VerletIntegrate(m_bodies, deltaTime);
 
+}
+
+void SimulationLayer::BarnesHutImplemantation()
+{
+	BarnesHut::Quad currentSpace = BarnesHut::Quad::CreateFromBounds(m_bodies);
+	m_quadtree.clear(currentSpace);
+	for (const auto& body : m_bodies) {
+		m_quadtree.insert(body.position, body.mass);
+	}
+	m_quadtree.propagate();
+	for (auto& body : m_bodies) {
+		sf::Vector2f gravitationalAcceleration = m_quadtree.acceleration(body.position);
+		body.acceleration = gravitationalAcceleration * GravitationalConstant;
+	}
 }
 
 void SimulationLayer::OnRender()

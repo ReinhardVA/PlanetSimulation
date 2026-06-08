@@ -40,8 +40,8 @@ namespace BarnesHut
 	class Quadtree {
 	private:
 		
-		float theta;
-		float epsilon;
+		float t_sq;
+		float e_sq;
 
 		size_t subdivide(size_t index);
 
@@ -53,7 +53,7 @@ namespace BarnesHut
 
 		Quadtree(float theta, float epsilon);
 
-		void clear();
+		void clear(Quad quad);
 		void insert(sf::Vector2f position, float mass);
 		void propagate();
 		sf::Vector2f acceleration(sf::Vector2f position) const;

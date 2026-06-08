@@ -1,4 +1,4 @@
-#include "Barnes-Hut.h"
+#include "BarnesHut.h"
 #include <cmath>
 
 namespace BarnesHut
@@ -65,6 +65,19 @@ namespace BarnesHut
 		}
 
 		return childIndex;
+	}
+
+	Quadtree::Quadtree(float theta, float epsilon)
+	{
+		t_sq = theta * theta;
+		e_sq = epsilon * epsilon;
+	}
+
+	void Quadtree::clear(Quad quad)
+	{
+		nodes.clear();
+		parents.clear();
+		nodes.push_back(Node(0, quad));
 	}
 
 	void Quadtree::insert(sf::Vector2f position, float mass)
@@ -151,9 +164,9 @@ namespace BarnesHut
 			sf::Vector2f distance = node.position - position;
 			float distanceSquared = distance.x * distance.x + distance.y * distance.y;
 
-			if (node.isLeaf() || (node.quad.size * node.quad.size < distanceSquared * theta * theta)) {
+			if (node.isLeaf() || (node.quad.size * node.quad.size < distanceSquared * t_sq)) {
 				if (distanceSquared > 0.0f) {
-					float denom = (distanceSquared + epsilon * epsilon) * std::sqrt(distanceSquared);
+					float denom = (distanceSquared + e_sq) * std::sqrt(distanceSquared);
 					float m_over_denom = std::min(node.mass / denom, std::numeric_limits<float>::max());
 					totalAcceleration += distance * m_over_denom;
 				}
