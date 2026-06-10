@@ -24,22 +24,25 @@ SimulationLayer::SimulationLayer() : m_quadtree(0.5f, 1.0f)
 	float centerY = screenSize.y / 2.0f;
 
 	CelestialBody sun = { {centerX, centerY}, {centerX, centerY},{0.0f, 0.0f}, {0.0f, 0.0f}, sunMass, sf::Color::Yellow };
-	//CelestialBody planet1 = { {centerX, centerY - 200.0f}, {centerX, centerY - 200.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, 10.0f, sf::Color::Blue };
-	//CelestialBody planet2 = { {centerX + 200.0f, centerY}, {centerX + 200.0f, centerY}, {0.0f, 0.0f}, {0.0f, 0.0f}, 50.0f, sf::Color::Red };
 
 	m_bodies.push_back(sun);
-	//m_bodies.push_back(planet1);
-	//m_bodies.push_back(planet2);
 	
 	for (size_t i = 0; i < 1000; ++i) {
 		float angle = (static_cast<float>(i) / 1000.0f) * 2.0f * std::numbers::pi_v<float>;
-		float radius = 300.0f + static_cast<float>(i) / 1000.0f * 200.0f;
+		// i = 0 -> angle = 0, i = 250 -> angle = pi/2, i = 500 -> angle = pi, i = 750 -> angle = 3pi/2, i = 1000 -> angle = 2pi
+		float radius = 300.0f + (100.0f / std::numbers::pi_v<float>) * angle; // archimedean spiral: r = a + b*theta, where a = 300 and b = 200/pi
 		
+		// convert polar coordinates to cartesian coordinates
 		float posX = centerX + radius * std::cos(angle);
 		float posY = centerY + radius * std::sin(angle);
+		
+		// Calculate orbital velocity for a circular orbit at this radius
 		float orbitalVelocity = std::sqrt(GravitationalConstant * sunMass / radius);
-		float velX = -std::sin(angle) * std::sin(angle);
-		float velY = std::cos(angle) * std::cos(angle);
+		
+		// Tangential velocity
+		float velX = -std::sin(angle) * orbitalVelocity;
+		float velY = std::cos(angle) * orbitalVelocity;
+
 		float randomMass = massDist(gen);
 		CelestialBody body = {
 			{posX, posY},
@@ -69,9 +72,9 @@ void SimulationLayer::OnUpdate(float deltaTime)
 	// Physics update
 	//Physics::CalculateGravitationalForces(m_bodies, GravitationalConstant);
 	
-	//Physics::EulerIntegrate(m_bodies, deltaTime);
+	Physics::EulerIntegrate(m_bodies, deltaTime);
 
-	Physics::VerletIntegrate(m_bodies, deltaTime);
+	//Physics::VerletIntegrate(m_bodies, deltaTime);
 
 }
 
